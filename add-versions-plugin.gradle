@@ -1,0 +1,43 @@
+initscript {
+  repositories {
+    gradlePluginPortal()
+  }
+
+  dependencies {
+    classpath 'com.github.ben-manes:gradle-versions-plugin:+'
+    classpath "com.hellofresh.gradle:deblibs:+"
+  }
+}
+
+
+allprojects {
+
+  repositories {
+    gradlePluginPortal()
+  }
+
+  apply plugin: com.github.benmanes.gradle.versions.VersionsPlugin
+  apply plugin: com.hellofresh.deblibs.DebLibsPlugin
+
+  // Configure dependencyUpdates task to ignore RCs, alphas, betas, milestone releases, etc...
+  dependencyUpdates {
+    resolutionStrategy {
+      componentSelection {
+        rules -> rules.all {
+          selection -> boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview'].any {
+            qualifier -> selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+          }
+          if (rejected) {
+            selection.reject('Release candidate')
+          }
+        }
+      }
+    }
+  }
+
+  deblibs {
+    projectName = System.getenv("PROJECT_NAME") ?: project.name
+    githubRepo = System.getenv("GITHUB_REPOSITORY") ?: "Inatysco/"+project.name
+    githubToken = System.getenv("GITHUB_TOKEN") ?: ""
+  }
+}
