@@ -1,43 +1,18 @@
 initscript {
-  repositories {
-    gradlePluginPortal()
-  }
-
-  dependencies {
-    classpath 'com.github.ben-manes:gradle-versions-plugin:+'
-    classpath "com.hellofresh.gradle:deblibs:+"
-  }
+    repositories {
+        gradlePluginPortal()
+    }
+    dependencies {
+        classpath "se.patrikerdes:gradle-use-latest-versions-plugin:0.2.14"
+        classpath "com.github.ben-manes:gradle-versions-plugin:0.28.0"
+    }
 }
 
-
 allprojects {
-
-  repositories {
-    gradlePluginPortal()
-  }
-
-  apply plugin: com.github.benmanes.gradle.versions.VersionsPlugin
-  apply plugin: com.hellofresh.deblibs.DebLibsPlugin
-
-  // Configure dependencyUpdates task to ignore RCs, alphas, betas, milestone releases, etc...
-  dependencyUpdates {
-    resolutionStrategy {
-      componentSelection {
-        rules -> rules.all {
-          selection -> boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm', 'preview'].any {
-            qualifier -> selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
-          }
-          if (rejected) {
-            selection.reject('Release candidate')
-          }
-        }
-      }
+    repositories {
+        gradlePluginPortal()
     }
-  }
 
-  deblibs {
-    projectName = System.getenv("PROJECT_NAME") ?: project.name
-    githubRepo = System.getenv("GITHUB_REPOSITORY") ?: "Inatysco/"+project.name
-    githubToken = System.getenv("GITHUB_TOKEN") ?: ""
-  }
+    apply plugin: com.github.benmanes.gradle.versions.VersionsPlugin
+    apply plugin: se.patrikerdes.UseLatestVersionsPlugin
 }
